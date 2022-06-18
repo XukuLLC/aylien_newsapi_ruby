@@ -15,6 +15,7 @@ require 'json'
 require 'logger'
 require 'tempfile'
 require 'faraday'
+require 'hashie'
 
 module AylienNewsApi
   class ApiClient
@@ -55,7 +56,7 @@ module AylienNewsApi
       }
 
       connection = Faraday.new(:url => config.base_url, :ssl => ssl_options) do |conn|
-        conn.basic_auth(config.username, config.password)
+        conn.request(:authorization, :basic, config.username, config.password)
         if opts[:header_params]["Content-Type"] == "multipart/form-data"
           conn.request :multipart
           conn.request :url_encoded
@@ -214,7 +215,9 @@ module AylienNewsApi
         end
       end
 
-      convert_to_type data, return_type
+      #convert_to_type data, return_type
+
+      Hashie::Mash.new(data)
     end
 
     # Convert data to the given return type.
